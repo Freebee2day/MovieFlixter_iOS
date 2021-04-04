@@ -10,32 +10,6 @@ import UIKit
 import AlamofireImage
 
 class MoviesViewController: UIViewController, UITableViewDataSource, UITextViewDelegate{
-
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return movieCollection.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let myCell = tvMovie.dequeueReusableCell(withIdentifier: "MovieTableViewCell") as! MovieTableViewCell
-        let singleMovie = movieCollection[indexPath.row]
-        
-        let singleMovieTitle = singleMovie["title"] as! String
-        myCell.MovieName?.text = singleMovieTitle
-        
-        let singleMovieSummary = singleMovie["overview"] as! String
-        myCell.MovieSummary?.text = singleMovieSummary
-        
-        let baseURL = "https://image.tmdb.org/t/p/w185/"
-        let imgPath = singleMovie["poster_path"] as! String
-        let imageURL = URL(string: baseURL + imgPath)
-        
-        myCell.ImgMovie.af.setImage(withURL: imageURL!)
-        
-        //myCell.ImgMovie.af_setImage(withURL: imageURL!)
-        
-        return myCell
-    }
     
     @IBOutlet weak var tvMovie: UITableView!
     
@@ -47,7 +21,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITextViewD
         
         tvMovie.delegate = self as? UITableViewDelegate
         tvMovie.dataSource = self
-    
+        
         
         let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed")!
         let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
@@ -73,17 +47,58 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITextViewD
         task.resume()
     }
     
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return movieCollection.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let myCell = tvMovie.dequeueReusableCell(withIdentifier: "MovieTableViewCell") as! MovieTableViewCell
+        let singleMovie = movieCollection[indexPath.row]
+        
+        let singleMovieTitle = singleMovie["title"] as! String
+        myCell.MovieName?.text = singleMovieTitle
+        
+        let singleMovieSummary = singleMovie["overview"] as! String
+        myCell.MovieSummary?.text = singleMovieSummary
+        
+        let baseURL = "https://image.tmdb.org/t/p/w185/"
+        let imgPath = singleMovie["poster_path"] as! String
+        let imageURL = URL(string: baseURL + imgPath)
+        
+        myCell.ImgMovie.af.setImage(withURL: imageURL!)
+        
+       
+        
+        return myCell
+    }
+    
 
     
 
     /*
-    // MARK: - Navigation
+     MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
+     In a storyboard-based application, you will often want to do a little preparation before navigation
+     Get the new view controller using segue.destination.
+     Pass the selected object to the new view controller.
     */
 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+         //sender is the movie cell that gets tapped on.
+        let tappedcell = sender as! UITableViewCell
+        let index = tvMovie.indexPath(for: tappedcell)!
+        
+        let selectedMovie = movieCollection[index.row]
+        
+        let mydetailVC = segue.destination as! DetailsViewController
+        
+        mydetailVC.sentMovie = selectedMovie
+        
+        tvMovie.deselectRow(at: index, animated: true)
+        
+        
+        
+    }
 }
